@@ -7,7 +7,7 @@ class Translator
   public function __construct
   (
     protected FileSystem $fileSystem,
-    protected string $locale,
+    protected string $locale = "tr",
   ) {  }
 
   public function get(
@@ -28,7 +28,7 @@ class Translator
     $item = $result[1];
     */
 
-    $line = $this->getLine($group, $locale, $item, $args);
+    $line = $this->getLine($group, $locale, $item, $args, single: $single, count: $count);
     if (!is_null($line)) {
       return $line;
     }
@@ -41,11 +41,21 @@ class Translator
     string $locale,
     ?string $item = null,
     array $args = [],
+    ?bool $single = null,
+    ?int $count = null,
   ): array|string|null
   {
     $this->load($group, $locale);
 
+    $item .= ($single === null) ? "" : (($single == true) ? ".single" : ".plural");
+
+    $item .= ($count > 0) ? ".specific" : "";
+
     $line = $this->findLine($this->loaded[$group][$locale], $item);
+
+    if($count > 0){
+        return $this->replaceArgs($line, ['count' => $count]);
+    }
 
     if (is_string($line)) {
       return $this->replaceArgs($line, $args);
@@ -53,7 +63,7 @@ class Translator
 
     if (is_array($line) && count($line) > 0) {
       foreach ($line as $key => $value) {
-        $line[$key] = $this->replaceArgs($value, $args);
+          $line[$key] = $this->replaceArgs($value, $args);
       }
 
       return $line;
@@ -87,6 +97,7 @@ class Translator
     {
       return $array;
     }
+
 
     if (!str_contains($key, '.')) {
       return $array[$key] ?? null;

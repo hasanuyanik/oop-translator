@@ -3,13 +3,15 @@
 require "filesystem.php";
 require "translator.php";
 
-IFileSystem
+//IFileSystem;
 
 $fs = new FileSystem(__DIR__."/diller");
 
+$lang = ($_GET['lang']) ? $_GET['lang'] : "tr";
+
 $translate = new Translator(
-  __DIR__."/diller",
-  $_GET['lang']
+  $fs,
+  $lang
 );
 
 echo "<h1>".$translate->get('user.index')."</h1>";
@@ -23,10 +25,17 @@ echo "<p>".$translate->get('user.olmayanBirAnahtar')."</p>"; // <p>user.olmayanB
 
 echo "<h1>".$translate->get('user.index', locale: "en")."</h1>";
 
-$translate->get('user.count', single: true); // Kullanıcı
-$translate->get('user.count', single: false); // Kullanıcılar
-$translate->get('user.count', count: 1); // 1 Kullanıcı
-$translate->get('user.count', count: 10); // 10 Kullanıcı
+echo "<hr>Single:true => ";
+var_dump($translate->get('user.count', single: true)); // Kullanıcı
+echo "<hr>Single: false => ";
+var_dump($translate->get('user.count', single: false)); // Kullanıcılar
+echo "<hr>count: 1 => ";
+var_dump($translate->get('user.count', count: 1)); // 1 Kullanıcı
+echo "<hr>count: 10 => ";
+var_dump($translate->get('user.count', count: 10)); // 10 Kullanıcı
+
+
+echo "<hr>";
 
 var_dump($translate->get("user.index"));
 var_dump($translate->get("user.show", ['name' => "Eray"]));
